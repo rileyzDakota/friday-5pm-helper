@@ -4,6 +4,7 @@ import sys
 
 from apiclient import discovery
 from datetime import datetime
+from dateutil.parser import isoparse
 
 from friday_5pm_helper import (
     EXPECTED_DATETIME_FORMATS,
@@ -44,7 +45,7 @@ class GCalendarClient():
         min_time = start_date.isoformat() + 'Z' # 'Z' indicates UTC time
         max_time = end_date.isoformat() + 'Z'
         eventsResult = self.service.events().list(
-            calendarId='primary',
+            calendarId='6b3f23202ff7b6b0312a9002ed6d79fe7bf3519c0bb70bbb34a67bdcf6f0c975@group.calendar.google.com',
             timeMin=min_time,
             timeMax=max_time,
             singleEvents=True,
@@ -55,21 +56,20 @@ class GCalendarClient():
 
 
 def calc_interval(start_time, end_time):
+    print(start_time, end_time)
     """
     :param start_time: start time in datetime
     :param end_time: end time in datetime
     :return: string hh:mm
     """
-    for f in EXPECTED_DATETIME_FORMATS:
-        try:
-            end_dt = datetime.strptime(end_time, f)
-            start_dt = datetime.strptime(start_time, f)
-            t_delta_secs = (end_dt - start_dt).seconds
-            return (worklog_time_spent(t_delta_secs), start_dt, end_dt)
-        except Exception as e:
-            pass
-    print('Error: unable to parse {} and {}'.format(start_time, end_time))
-    return None
+    try:
+        start_dt = isoparse(start_time)
+        end_dt = isoparse(end_time)
+        t_delta_secs = (end_dt - start_dt).seconds
+        return (worklog_time_spent(t_delta_secs), start_dt, end_dt)
+    except Exception as e:
+        print(f"Error parsing datetime: {e}")
+        return None
 
 
 def retrieve_gcalendar_event_data(start_date, end_date, tasks_info):
@@ -92,7 +92,9 @@ def retrieve_gcalendar_event_data(start_date, end_date, tasks_info):
             day=start.day,
             interval=interval,
             comment=event['summary'],
-            taskid=tasks_info['InternalMeeting']
+            taskid=tasks_info['InternalMeeting'],
+            start_time=start,
+            end_time=end
         ))
 
     return time_entry_data_list

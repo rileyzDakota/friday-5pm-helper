@@ -5,7 +5,7 @@ from collections import namedtuple
 from datetime import datetime, timedelta
 
 
-TimeEntryData = namedtuple('TimeEntryData', 'year month day interval comment taskid')
+TimeEntryData = namedtuple('TimeEntryData', 'year month day interval comment taskid start_time end_time')
 
 EXPECTED_DATETIME_FORMATS = [
     '%Y-%m-%dT%H:%M:%S+11:00',
@@ -21,8 +21,9 @@ def unique_unit_of_work_id():
 
 
 def worklog_time_spent(time_spent_secs):
-    return '{:02d}:{:02d}'.format(time_spent_secs / 3600, time_spent_secs % 3600 / 60)
-
+    hours = int(time_spent_secs // 3600)
+    minutes = int((time_spent_secs % 3600) // 60)
+    return '{:02d}:{:02d}'.format(hours, minutes)
 
 def worklog_date(updated_date_str):
     if updated_date_str is not None:

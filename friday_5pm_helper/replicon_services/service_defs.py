@@ -49,15 +49,21 @@ def get_time_entries_for_user_and_date_range(
         }
     )
 
-def put_time_entry(login_name, y, m, d, hrs, mins, task_uri, comment, unique_unit_of_work_id):
+def put_time_entry(user_uri, y, m, d, comment, unique_unit_of_work_id, correlation_id, start_time, end_time):
+    # Assuming start_time and end_time are strings in "HH:MM" format
+    start_hour, start_minute = map(int, start_time.split(':'))
+    end_hour, end_minute = map(int, end_time.split(':'))
+
     return RequestData(
-        service_url='TimeEntryService3.svc/PutTimeEntry',
+        service_url='TimeEntryRevisionGroupService1.svc/PutTimeEntryRevisionGroup',
         data={
-            "timeEntry": {
+            "timeEntryRevisionGroup": {
                 "target": {
+                    "parameterCorrelationId": correlation_id,
+                    "uri": None
                 },
                 "user": {
-                    "loginName": login_name,
+                    "uri": user_uri,
                 },
                 "entryDate": {
                     "year": y,
@@ -69,19 +75,21 @@ def put_time_entry(login_name, y, m, d, hrs, mins, task_uri, comment, unique_uni
                     "urn:replicon:time-allocation-type:project"
                 ],
                 "interval": {
-                    "hours": {
-                        "hours": hrs,
-                        "minutes": mins,
-                        "seconds": "0",
-                    },
+                    "hours": None,
+                    "timePair": {
+                        "startTime": {
+                            "hour": start_hour,
+                            "minute": start_minute,
+                            "second": 0
+                        },
+                        "endTime": {
+                            "hour": end_hour,
+                            "minute": end_minute,
+                            "second": 0
+                        }
+                    }
                 },
                 "customMetadata": [
-                    {
-                        "keyUri": "urn:replicon:time-entry-metadata-key:task",
-                        "value": {
-                            "uri": task_uri,
-                        }
-                    },
                     {
                         "keyUri": "urn:replicon:time-entry-metadata-key:comments",
                         "value": {
