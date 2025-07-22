@@ -2,7 +2,6 @@
 client_secret_gcalendar.json
 client_secret_replicon.json
 client_secret_jira.json
-client_replicon_configs.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

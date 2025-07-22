@@ -1,0 +1,8 @@
+{
+  "tasks":{
+        "calendar": {
+            "InternalMeeting": "42"
+        },
+        "jira" : {}
+    }
+}
